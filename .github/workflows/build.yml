@@ -1,0 +1,52 @@
+name: Build Zed Nightly
+
+on:
+  schedule:
+    - cron: "0 0 * * *"
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+    env:
+      RUSTFLAGS: "--cfg gles"
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          repository: zed-industries/zed
+          ref: main
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: nightly
+          targets: wasm32-wasi
+
+      - uses: Swatinem/rust-cache@v2
+
+      - name: Build release
+        run: cargo build --release
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: zed-release
+          path: target/release/zed.exe
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: zed-release
+
+      - run: echo "CURRENT_DATE=$(date +'%Y%m%d')" >> $GITHUB_ENV
+
+      - uses: softprops/action-gh-release@v2
+        with:
+          name: ${{ env.CURRENT_DATE }}
+          tag_name: ${{ env.CURRENT_DATE }}
+          draft: false
+          make_latest: true
+          files: zed.exe
