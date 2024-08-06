@@ -28,7 +28,7 @@ jobs:
 
       - uses: actions/upload-artifact@v4
         with:
-          name: zed-release-gles
+          name: zed-release-windows-gles
           path: target/release/zed.exe
 
   release:
@@ -39,14 +39,14 @@ jobs:
     steps:
       - uses: actions/download-artifact@v4
         with:
-          name: zed-release-gles
+          name: zed-release-windows-gles
 
-      - run: echo "CURRENT_DATE=$(date +'%Y%m%d')" >> $GITHUB_ENV
+      - run: echo "TAG_NAME=$(tr -dc 'a-f0-9' < /dev/urandom | head -c8)" >> $GITHUB_ENV
 
       - uses: softprops/action-gh-release@v2
         with:
-          name: "zed-release-gles-${{ env.CURRENT_DATE }}"
-          tag_name: "${{ env.CURRENT_DATE }}"
+          name: "zed-release-windows-gles"
+          tag_name: ${{ env.TAG_NAME }}
           draft: false
           make_latest: true
           files: zed.exe

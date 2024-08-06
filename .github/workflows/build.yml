@@ -39,12 +39,12 @@ jobs:
         with:
           name: zed-release
 
-      - run: echo "CURRENT_DATE=$(date +'%Y%m%d')" >> $GITHUB_ENV
+      - run: echo "TAG_NAME=$(tr -dc 'a-f0-9' < /dev/urandom | head -c8)" >> $GITHUB_ENV
 
       - uses: softprops/action-gh-release@v2
         with:
-          name: ${{ env.CURRENT_DATE }}
-          tag_name: ${{ env.CURRENT_DATE }}
+          name: "zed-release-windows"
+          tag_name: ${{ env.TAG_NAME }}
           draft: false
           make_latest: true
           files: zed.exe
