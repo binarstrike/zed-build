@@ -1,4 +1,4 @@
-name: Build Zed Nightly
+name: Build Zed Nightly GLES
 
 on:
   schedule:
@@ -8,6 +8,8 @@ on:
 jobs:
   build:
     runs-on: windows-latest
+    env:
+      RUSTFLAGS: "--cfg gles"
     steps:
       - uses: actions/checkout@v3
         with:
