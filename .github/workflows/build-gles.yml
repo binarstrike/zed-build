@@ -45,7 +45,7 @@ jobs:
 
       - uses: softprops/action-gh-release@v2
         with:
-          name: "zed-release-windows-gles"
+          name: "zed-release-windows-gles-${{ env.TAG_NAME }}"
           tag_name: ${{ env.TAG_NAME }}
           draft: false
           make_latest: true
