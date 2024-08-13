@@ -9,6 +9,7 @@ on:
         type: choice
         options:
           - --cfg gles
+          - " "
 
 jobs:
   build:
