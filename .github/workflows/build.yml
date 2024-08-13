@@ -40,7 +40,10 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           name: zed-release
-
+      - uses: actions/checkout@v3
+        with:
+          repository: zed-industries/zed
+          ref: main
       - run: |
           echo "TAG_NAME=$(tr -dc 'a-f0-9' < /dev/urandom | head -c8)" >> $GITHUB_ENV
           git rev-list --format=%B --max-count=1 main | tee ./commit_desc.txt >/dev/null
