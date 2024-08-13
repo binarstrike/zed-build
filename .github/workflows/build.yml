@@ -4,10 +4,17 @@ on:
   schedule:
     - cron: "0 0 * * *"
   workflow_dispatch:
+    inputs:
+      rustflags:
+        type: choice
+        options:
+          - --cfg gles
 
 jobs:
   build:
     runs-on: windows-latest
+    env:
+      RUSTFLAGS: ${{ github.event.inputs.rustflags }}
     steps:
       - uses: actions/checkout@v3
         with:
@@ -34,25 +41,30 @@ jobs:
     runs-on: ubuntu-latest
     env:
       TAG_NAME:
+      COMMIT_DESC:
+      RELEASE_NAME:
     permissions:
       contents: write
     steps:
-      - uses: actions/download-artifact@v4
-        with:
-          name: zed-release
       - uses: actions/checkout@v3
         with:
           repository: zed-industries/zed
           ref: main
+
       - run: |
-          echo "TAG_NAME=$(tr -dc 'a-f0-9' < /dev/urandom | head -c8)" >> $GITHUB_ENV
-          git rev-list --format=%B --max-count=1 main | tee ./commit_desc.txt >/dev/null
+          echo "TAG_NAME=$(tr -dc 'a-f0-9' 2>/dev/null < /dev/urandom | head -c8)" >> $GITHUB_ENV
+          echo "COMMIT_DESC=$(git rev-list --format=%B --max-count=1 main)" >> $GITHUB_ENV
+          echo "RELEASE_NAME=$([[ "${{ github.event.inputs.rustflags }}" == *"gles"* ]] && echo zed-release-windows-gles || zed-release-windows)" >> $GITHUB_ENV
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: zed-release
 
       - uses: softprops/action-gh-release@v2
         with:
-          name: "zed-release-windows-${{ env.TAG_NAME }}"
+          name: ${{ env.RELEASE_NAME }}
           tag_name: ${{ env.TAG_NAME }}
           draft: false
           make_latest: true
-          body_path: "./commit_desc.txt"
+          body: ${{ env.COMMIT_DESC }}
           files: zed.exe
