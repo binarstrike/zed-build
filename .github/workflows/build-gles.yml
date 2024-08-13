@@ -34,6 +34,8 @@ jobs:
   release:
     needs: build
     runs-on: ubuntu-latest
+    env:
+      TAG_NAME:
     permissions:
       contents: write
     steps:
@@ -41,7 +43,9 @@ jobs:
         with:
           name: zed-release-windows-gles
 
-      - run: echo "TAG_NAME=$(tr -dc 'a-f0-9' < /dev/urandom | head -c8)" >> $GITHUB_ENV
+      - run: |
+          echo "TAG_NAME=$(tr -dc 'a-f0-9' < /dev/urandom | head -c8)" >> $GITHUB_ENV
+          git rev-list --format=%B --max-count=1 main | tee ./commit_desc.txt >/dev/null
 
       - uses: softprops/action-gh-release@v2
         with:
@@ -49,4 +53,5 @@ jobs:
           tag_name: ${{ env.TAG_NAME }}
           draft: false
           make_latest: true
+          body_path: "./commit_desc.txt"
           files: zed.exe
