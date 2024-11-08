@@ -1,6 +1,8 @@
 name: Build Zed Nightly
 
 on:
+  schedule:
+    - cron: 0 0 * * *
   workflow_dispatch:
     inputs:
       rustflags:
@@ -26,6 +28,10 @@ jobs:
           targets: wasm32-wasi
 
       - uses: Swatinem/rust-cache@v2
+
+      - name: Enable LongPathsEnabled registry key
+        shell: powershell
+        run: Set-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Control\FileSystem\" -Name LongPathsEnabled -Value 1
 
       - name: Build release
         run: cargo build --release
