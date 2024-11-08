@@ -17,6 +17,9 @@ jobs:
     env:
       RUSTFLAGS: ${{ github.event.inputs.rustflags }}
     steps:
+      - name: Enable long path support
+        run: git config --system core.longpaths true
+  
       - uses: actions/checkout@v4
         with:
           repository: zed-industries/zed
@@ -28,10 +31,6 @@ jobs:
           targets: wasm32-wasi
 
       - uses: Swatinem/rust-cache@v2
-
-      - name: Enable LongPathsEnabled registry key
-        shell: powershell
-        run: Set-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Control\FileSystem\" -Name LongPathsEnabled -Value 1
 
       - name: Build release
         run: cargo build --release
