@@ -55,16 +55,19 @@ jobs:
 
       - run: |
           echo "TAG_NAME=$(tr -dc 'a-f0-9' 2>/dev/null < /dev/urandom | head -c8)" >> $GITHUB_ENV
-          echo "RELEASE_NAME=$([[ "${{ github.event.inputs.rustflags }}" == *"gles"* ]] && echo zed-release-windows-gles || echo zed-release-windows)" >> $GITHUB_ENV
+          echo "RELEASE_NAME=$([[ "${{ github.event.inputs.rustflags }}" == *"gles"* ]] && echo zed-windows-gles || echo zed-windows)" >> $GITHUB_ENV
 
       - uses: actions/download-artifact@v4
         with:
           name: zed-release
 
+      - name: Compress zed binary
+        run: zip -rv9 Zed.zip zed.exe
+
       - uses: softprops/action-gh-release@v2
         with:
-          name: ${{ env.RELEASE_NAME }}
+          name: ${{ env.RELEASE_NAME }}-${{ env.TAG_NAME }}
           tag_name: ${{ env.TAG_NAME }}
           draft: false
           make_latest: true
-          files: zed.exe
+          files: Zed.zip
