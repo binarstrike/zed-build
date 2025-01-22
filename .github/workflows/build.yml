@@ -14,8 +14,8 @@ on:
 jobs:
   build:
     runs-on: windows-latest
-    env:
-      RUSTFLAGS: ${{ github.event.inputs.rustflags }}
+    #env:
+      #RUSTFLAGS: ${{ github.event.inputs.rustflags }}
     steps:
       - uses: actions/checkout@v4
         with:
